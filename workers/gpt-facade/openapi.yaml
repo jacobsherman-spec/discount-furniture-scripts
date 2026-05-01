@@ -1,2 +1,77 @@
+openapi: 3.1.0
+info:
+  title: Discount Furniture GPT Facade
+  version: 2026-05-01
 servers:
   - url: https://discount-furniture-gpt-facade.jacobsherman.workers.dev
+paths:
+  /health:
+    get:
+      operationId: healthCheck
+      responses:
+        '200':
+          description: OK
+  /read:
+    post:
+      operationId: readDiscountFurnitureData
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReadRequest'
+      responses:
+        '200': { description: OK }
+  /preview:
+    post:
+      operationId: previewDiscountFurnitureUpdate
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PreviewRequest'
+      responses:
+        '200': { description: OK }
+  /write:
+    put:
+      operationId: writeDiscountFurnitureUpdate
+      x-openai-isConsequential: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WriteRequest'
+      responses:
+        '200': { description: OK }
+components:
+  schemas:
+    ReadRequest:
+      type: object
+      additionalProperties: true
+    PreviewRequest:
+      type: object
+      required: [type, productId]
+      properties:
+        type: { type: string, enum: [pricing_update, pricing_rollback] }
+        productId: { oneOf: [{ type: string }, { type: integer }] }
+        price_update_type: { type: string, enum: [supplier_price, retail_price, supplier_and_retail_price] }
+        retail_price: { type: number }
+        supplier_price: { type: number }
+        supplier_code: { type: string }
+        product_supplier_id: { oneOf: [{ type: string }, { type: integer }] }
+        supplier_id: { oneOf: [{ type: string }, { type: integer }] }
+        price_book_id: { oneOf: [{ type: string }, { type: integer }] }
+        price_book_product_id: { oneOf: [{ type: string }, { type: integer }] }
+        history_id: { oneOf: [{ type: string }, { type: integer }] }
+      additionalProperties: true
+    WriteRequest:
+      allOf:
+        - $ref: '#/components/schemas/PreviewRequest'
+        - type: object
+          required: [approved, confirm_sku, expected_current_price_hash]
+          properties:
+            approved: { type: boolean }
+            confirm_sku: { type: string }
+            expected_current_price_hash: { type: string }
