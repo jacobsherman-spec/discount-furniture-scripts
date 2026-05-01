@@ -1,0 +1,7 @@
+name = "discount-furniture-gpt-facade"
+main = "src/index.js"
+compatibility_date = "2026-04-29"
+
+[[services]]
+binding = "INTERNAL_BRIDGE_SERVICE"
+service = "dark-voice-0a31discount-furniture-lightspeed-readonly"
